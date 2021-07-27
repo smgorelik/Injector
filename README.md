@@ -1,6 +1,6 @@
 ## Day 2 - Jektor Toolkit v1.0
 
-**Context:** This is an older tool I once wrote during an offensive, malware development competition. It was supposed to demonstrate various shellcode injection/execution methods in user-mode. This tool is in an **archived** state, I won't be providing any updates.
+**Context:** This is a tool I once wrote during an offensive, malware development competition. It demonstrated various shellcode injection/execution methods.
 
 This challenge focused on shellcode injection techniques to demonstrate methods that malware may use to execute shellcode on a victim system
 
