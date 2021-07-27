@@ -26,14 +26,27 @@ Important functions such as VirtualAlloc are not directly called which makes deb
 
 ### Local shellcode execution via CreateThread
 
+On Windows when you want to create a new thread for the current process you can call the CreateThread function, this is the most basic technique for executing malicious code or shellcode within a process. You can simply allocate a region of memory for your shellcode, move your shellcode into the allocated region, and then call CreateThread with a pointer to the address of the allocated region. When you call CreateThread you pass the lpStartAddress
+parameter which is a pointer to the application-defined function that will be executed by the newly created thread. 
+
+![f78e209597194051a4ebb74d3f519c5a](https://user-images.githubusercontent.com/70239991/124507531-7a93dc00-ddbd-11eb-8e07-350720a94f3f.png)
+
 1.  Allocate a region of memory big enough for the shellcode using VirtualAlloc
 2.  Move the globally defined shellcode buffer into the newly allocated memory region with memcpy/RtlCopyMemory
 3.  Create a new thread that includes the base address of the allocated memory region with CreateThread
 4.  Wait for the new thread to be created/executed with WaitForSingleObject to ensure the payload detonates
 
-![f78e209597194051a4ebb74d3f519c5a](https://user-images.githubusercontent.com/70239991/124507531-7a93dc00-ddbd-11eb-8e07-350720a94f3f.png)
+After the memory region for the shellcode payload is allocated as RWX and the payload is moved into it, you can easily discover this region of memory by looking for any region of memory in the process that is marked as RWX, then if you inspect it you can seen the shellcode payload was moved into it, highlighted below are the first five bytes of the shellcode payload that executes a calculator on the victim system.
+
+![image](https://user-images.githubusercontent.com/70239991/126000980-f0e774cf-ede3-469c-a2d0-cc4c416f4392.png)
+
+Hunting for RWX regions of memory is a quick way to identify potentially malicious activity on your system.
+
+![image](https://user-images.githubusercontent.com/70239991/126001037-6916ec4f-456c-4f47-922b-dc77fde403af.png)
 
 ### Remote shellcode execution via CreateRemoteThread
+
+Another technique to create threads for shellcode execution is to call the CreateRemoteThread function, this will allow you to create threads remotely in another process. But the catch is that you will also want to allocate and write the shellcode payload into the remote process as well, since you’ll create a thread remotely that executes the payloads address that’s allocated within that process. In order to allocate the payload remotely, you’ll need to use the VirtualAllocEx function, this function is different from VirtualAlloc in that it can allocate memory regions remotely and in other processes. To do this, Jektor creates a new process with the CREATE_NO_WINDOW flag set using CreateProcessW, this is used to spawn a new hidden notepad process. One the new process is spawn it remotely allocated memory in it using VirtualAllocEx and then uses WriteProcessMemory to write the shellcode payload into the remote buffer in the remote payload. After this it calls CreateRemoteThread to execute the shellcode payload.
 
 1.  Spawn a new process using CreateProcessW with CREATE\_NO\_WINDOW set
 2.  Open a HANDLE to the newly spawed process by PID with OpenProcess and dwProcessId from PROCESS_INFORMATION
