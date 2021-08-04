@@ -1,8 +1,6 @@
 ## Day 2 - Jektor Toolkit v1.0
 
-**Context:** This is a tool I once wrote during an offensive, malware development competition. It demonstrated various shellcode injection/execution methods.
-
-This challenge focused on shellcode injection techniques to demonstrate methods that malware may use to execute shellcode on a victim system
+This utility focuses on shellcode injection techniques to demonstrate methods that malware may use to execute shellcode on a victim system
 
 - [x] Dynamically resolves API functions to evade IAT inclusion
 - [x] Includes usage of undocumented NT Windows API functions
