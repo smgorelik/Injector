@@ -1,4 +1,4 @@
-## Day 2 - Jektor Toolkit v1.0
+## Jektor Toolkit v1.0
 
 This utility focuses on shellcode injection techniques to demonstrate methods that malware may use to execute shellcode on a victim system
 
