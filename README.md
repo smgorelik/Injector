@@ -38,7 +38,7 @@ After the memory region for the shellcode payload is allocated as RWX and the pa
 
 ![image](https://user-images.githubusercontent.com/70239991/126000980-f0e774cf-ede3-469c-a2d0-cc4c416f4392.png)
 
-Hunting for RWX regions of memory is a quick way to identify potentially malicious activity on your system.
+Hunting for RWX regions of memory is a quick way to identify potentially malicious activity on your system. Keep in mind, actors can also allocate a memory region as PAGE_READWRITE, write their shellcode into it, and then switch it to exectuable via VirtualProtect later on, this can help evade detection of a PAGE_EXECUTE_READWRITE memory region.
 
 ![image](https://user-images.githubusercontent.com/70239991/126001037-6916ec4f-456c-4f47-922b-dc77fde403af.png)
 
