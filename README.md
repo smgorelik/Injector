@@ -56,6 +56,17 @@ Another technique to create threads for shellcode execution is to call the Creat
 
 ### Local shellcode execution via EnumTimeFormatsEx
 
+`EnumTimeFormatsEx` is a Windows API function that enumerates provided time formats, it's useful for executing shellcode because it's first parameter accepts a user-defined pointer that gets executed.  
+
+```c++
+BOOL EnumTimeFormatsEx(
+  [in]           TIMEFMT_ENUMPROCEX lpTimeFmtEnumProcEx,
+  [in, optional] LPCWSTR            lpLocaleName,
+  [in]           DWORD              dwFlags,
+  [in]           LPARAM             lParam
+);
+```
+
 1.  Allocate memory locally for the shellcode payload with VirtualAlloc
 2.  Move the shellcode payload into the newly allocated region with memcpy/RtlCopyMemory
 3.  Detonate the shellcode by passing it as the lpTimeFmtEnumProcEx parameter for EnumTimeFormatsEx
@@ -63,6 +74,8 @@ Another technique to create threads for shellcode execution is to call the Creat
 ![9875383125f74cc090c749fd95aef4f8](https://user-images.githubusercontent.com/70239991/124507573-913a3300-ddbd-11eb-8bcc-e95f861e1607.png)
 
 ### Local shellcode execution via CreateFiber
+
+MSDN defines a fiber as a unit of execution that needs to be manually scheduled by an application. Similar to using CreateThread for executing shellcode, we can instead use Fibers. We convert our processes main thread into a fiber, allocate our shellcode, and executing it when calling SwitchToFiber which executes the new fiber we created. 
 
 1. Get a HANDLE to the current thread using GetCurrentThread
 2. Convert the main thread to a Fiber using ConvertThreadToFiber
