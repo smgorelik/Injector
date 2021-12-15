@@ -75,7 +75,7 @@ BOOL EnumTimeFormatsEx(
 
 ### Local shellcode execution via CreateFiber
 
-MSDN defines a fiber as a unit of execution that needs to be manually scheduled by an application. Similar to using CreateThread for executing shellcode, we can instead use Fibers. We convert our processes main thread into a fiber, allocate our shellcode, and executing it when calling SwitchToFiber which executes the new fiber we created. 
+MSDN defines a fiber as a unit of execution that needs to be manually scheduled by an application. Similar to using CreateThread for executing shellcode, we can instead use Fibers. We convert our processes main thread into a fiber, allocate our shellcode, and execute it by calling SwitchToFiber which executes the new fiber we created. 
 
 1. Get a HANDLE to the current thread using GetCurrentThread
 2. Convert the main thread to a Fiber using ConvertThreadToFiber
