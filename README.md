@@ -22,6 +22,8 @@ Jektor makes use of dynamic function address resolutions using LoadLibrary and G
 
 Important functions such as VirtualAlloc are not directly called which makes debugging and dumping the shellcode through breakpoints more difficult.
 
+----
+
 ### Local shellcode execution via CreateThread
 
 On Windows when you want to create a new thread for the current process you can call the CreateThread function, this is the most basic technique for executing malicious code or shellcode within a process. You can simply allocate a region of memory for your shellcode, move your shellcode into the allocated region, and then call CreateThread with a pointer to the address of the allocated region. When you call CreateThread you pass the lpStartAddress
