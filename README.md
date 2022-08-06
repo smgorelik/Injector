@@ -1,4 +1,6 @@
-## Original version is credited to https://github.com/FULLSHADE/Jektor  
+## This is an extended version of the original Jektor credited to 
+https://github.com/FULLSHADE/Jektor  
+
 
 This utility focuses on shellcode injection techniques to demonstrate methods that malware may use to execute shellcode on a victim system
 
